@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block styles%}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            {% for opinion in opinions %}
+            <div class="body-content mt-3">
+                <h4 class="opinion-title">{{opinion.opinion_title}}</h4>
+                <h5 class="subtitle"> {{opinion.description}}</h5>
+                
+                <button type="button" class="btn btn-outline-success btn-sm"><a
+                        href="/new_comment/{{opinion.id}}">Comment</a></button>
+                <button type="button" class="btn btn-outline-success btn-sm"><a href="/comments/{{opinion.id}}">View
+                        comment</a></button>
+                        <hr>
+                        <hr>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
