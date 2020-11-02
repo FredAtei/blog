@@ -12,7 +12,7 @@ Fred Atei
 
 ## Figma
 
-[Click to View]()
+[Click to View](https://www.figma.com/file/dQxr7e6J80oz5Q6QZ7GwoJ/Untitled?node-id=1%3A12)
 
 ### Development
 Want to contribute? Great!
