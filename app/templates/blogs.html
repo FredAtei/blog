@@ -1,0 +1,43 @@
+{% extends 'base.html'%}
+
+{% block styles%}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static',filename='css/blogs.css')}}" type="text/css">
+{% endblock styles%}
+
+
+
+{%block content%}
+
+<div class="row">
+    {% for blog in blogs %}
+    <div class="col-md-9">
+        <div class="card">
+            
+          <div class="card-body" >
+            <blockquote class=" card-body">
+                <h2 class="text-center" style="font-size:1.5rem; font-family: 'Poppins', sans-serif; ">{{blog.title}}</h2>
+                <p style="font-size: 1.3rem;">{{blog.content}}</p> 
+                {% if blog.user == current_user %}
+                 
+                <a class="btn btn-sm" href="{{ url_for('main.updateblog', blog_id=blog.id) }}" style="color: blue;">Review</a>
+         
+                {% endif %}
+      
+                <footer class="blockquote-footer">
+               
+                    <cite title="Source Title" style="color: black; font-size:1.2rem ;" >{{ blog.user.username }}</cite>
+                    <small style="float:right; font-size:0.9rem;">{{ blog.posted_on.strftime('%d-%m-%Y') }}</small>
+                </footer>
+                
+            </blockquote>
+          </div>
+            
+        
+        </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{%endblock%}

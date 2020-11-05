@@ -4,28 +4,25 @@ from flask_login import UserMixin
 from . import login_manager
 from datetime import datetime
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-  
 class User(UserMixin,db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key = True)
     username = db.Column(db.String(255),index = True)
     email = db.Column(db.String(255),unique = True,index = True)
-    role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
     bio = db.Column(db.String(255))
     profile_pic_path = db.Column(db.String())
+    blog = db.relationship('Blog', backref='user', lazy='dynamic')
+    comment = db.relationship('Comment', backref='user', lazy='dynamic')
     pass_secure = db.Column(db.String(255))
-    opinion = db.relationship('Opinion', backref='username', lazy='dynamic')
-    comments = db.relationship('Comment', backref='username', lazy=True)
     
     @property
     def password(self):
-        raise AttributeError('You cannot read the password attribute')
+        raise AttributeError('You cannnot read the password attribute')
 
     @password.setter
     def password(self, password):
@@ -34,71 +31,66 @@ class User(UserMixin,db.Model):
 
     def verify_password(self,password):
         return check_password_hash(self.pass_secure,password)
-    
+
     def __repr__(self):
         return f'User {self.username}'
-    
-class Role(db.Model):
-    __tablename__ = 'roles'
 
-    id = db.Column(db.Integer,primary_key = True)
-    name = db.Column(db.String(255))
-    users = db.relationship('User',backref = 'role',lazy="dynamic")
-    
-
-    def __repr__(self):
-        return f'User {self.name}'
-    
-
-class Opinion(db.Model):
-    __tablename__ = 'opinions'
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    opinion_title = db.Column(db.String(255), index=True)
-    description = db.Column(db.String(255), index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    
-
-    def save_opinion(self):
-        db.session.add(self)
-        db.session.commit()
-
-    @classmethod
-    def get_opinions(cls, id):
-        opinions = Post.query.filter_by(id=id).all()
-        return opinions
-
-    @classmethod
-    def get_all_opinions(cls):
-        opinions = Opinion.query.order_by('-id').all()
-        return opinions
-
-    def __repr__(self):
-        return f'Posts {self.opinion_title}'
-    
-class Comment(db.Model):
-    __tablename__ = 'comments'
-
-    id = db.Column(db.Integer, primary_key=True)
-    comment = db.Column(db.Text())
-    opinion_id = db.Column(db.Integer, db.ForeignKey('opinions.id'))
+class Blog(db.Model):
+    __tablename__ = 'blogs'
+    id = db.Column(db.Integer,primary_key=True)
+    title = db.Column(db.String(255),nullable=False)
+    content = db.Column(db.String())
+    posted_on = db.Column(db.DateTime,nullable=False,default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    comment = db.relationship('Comment', backref='blog', lazy='dynamic')
 
-    def save_comment(self):
+    def save(self):
         db.session.add(self)
         db.session.commit()
-
-    @classmethod
-    def get_comments(cls, opinion_id):
-        comments = Comment.query.filter_by(opinion_id=opinion_id).all()
-        return comments
 
     def delete(self):
         db.session.delete(self)
         db.session.commit()
 
+    @classmethod
+    def get_blog(id):
+        blog = Blog.query.filter_by(id=id).first()
+
+        return blog
+
     def __repr__(self):
-        return f'Comments: {self.comment}'        
+        return f"Blog ('{self.title}','{self.posted_on}')"
+
+class Comment(db.Model):
+    __tablename__='comments'
+
+    id = db.Column(db.Integer,primary_key = True)
+    comment = db.Column(db.String)
+    posted = db.Column(db.DateTime,default=datetime.utcnow)
+    blog_id = db.Column(db.Integer,db.ForeignKey("blogs.id"))
+    user_id = db.Column(db.Integer,db.ForeignKey("users.id"))
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.remove(self)
+        db.session.commit()
+
+    def get_comment(id):
+        comment = Comment.query.all(id=id)
+        return comment
+
+    @classmethod
+    def get_comments(cls,id):
+        comments = Comment.query.filter_by(blog_id=id).all()
+        return comments 
+        
+
+    def __repr__(self):
+        return f"Comment : id: {self.id} comment: {self.comment}"        
+
+
+
+

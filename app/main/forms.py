@@ -1,17 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,TextAreaField,SubmitField,SelectField
+from wtforms import StringField,TextAreaField,SubmitField
 from wtforms.validators import Required
-
 
 class UpdateProfile(FlaskForm):
     bio = TextAreaField('Tell us about you.',validators = [Required()])
     submit = SubmitField('Submit')
-    
-class OpinionForm(FlaskForm):
-    opinion_title = StringField('Blog Name')
-    description = TextAreaField('Blog')
-    submit = SubmitField('Submit')
-    
-class CommentForm(FlaskForm):
-    comment = TextAreaField('Comment')
-    submit = SubmitField('Post a comment')
+
+class AddBlog(FlaskForm):
+    title = StringField('Title', validators =[Required()])
+    content = TextAreaField('Content', validators = [Required()])
+    submit = SubmitField('Post Blog')    
